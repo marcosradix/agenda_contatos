@@ -46,6 +46,6 @@
     <key>NSCameraUsageDescription</key>
     <string>Selecionar uma foto de contato da galeria.</string>
     <key>NSMicrophoneUsageDescription</key>
-    <string>Tirar fotos dos contatos.</string>
+    <string>Tirar fotos dos contatos.</string>    
 </dict>
 </plist>

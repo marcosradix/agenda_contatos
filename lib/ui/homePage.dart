@@ -4,29 +4,28 @@ import 'package:agenda_contatos/ui/contactPage.dart';
 import 'package:agenda_contatos/utils/imageUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get_it/get_it.dart';
 
 class HomePage extends StatefulWidget {
+  final CallsAndMessagesService service;
+  HomePage(this.service);
+
   @override
   _HomePageState createState() {
-    setupLocator();
     return _HomePageState();
-  } 
+  }
 }
 
 class _HomePageState extends State<HomePage> {
   ContactHelper helper = ContactHelper();
   List<Contact> contacts = List();
   var _scaffoldKey = new GlobalKey<ScaffoldState>();
-  final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
-
-
-
+  CallsAndMessagesService _service;
 
   @override
   void initState() {
     super.initState();
     _loadContacts();
+    _service = widget.service;
   }
 
   @override
@@ -100,8 +99,11 @@ class _HomePageState extends State<HomePage> {
       ),
       onTap: () {
         HapticFeedback.mediumImpact();
-        _service.call(contacts[index].phone);
-      } ,
+        String nemNumber =
+            contacts[index].phone.replaceAll(RegExp(r'[^\w\s]+'), '');
+        String phoneNumber = nemNumber.replaceAll(" ", "");
+        _service.call(phoneNumber);
+      },
       onLongPress: () {
         HapticFeedback.mediumImpact();
         _showOptions(context, index);
@@ -126,6 +128,28 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: BorderRadius.circular(30.0)),
                           child: Column(
                             children: <Widget>[
+                              Icon(Icons.edit),
+                              Text(
+                                "Editar",
+                                style: TextStyle(color: Colors.white),
+                              )
+                            ],
+                          ),
+                          color: Colors.blue,
+                          padding: EdgeInsets.all(7.0),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _showContactPage(contact: contacts[index]);
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: FlatButton(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0)),
+                          child: Column(
+                            children: <Widget>[
                               Icon(Icons.delete_forever),
                               Text(
                                 "Apagar",
@@ -140,28 +164,6 @@ class _HomePageState extends State<HomePage> {
                             Navigator.pop(context);
                             contacts.removeAt(index);
                             _loadContacts();
-                          },
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: FlatButton(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0)),
-                          child: Column(
-                            children: <Widget>[
-                              Icon(Icons.edit),
-                              Text(
-                                "Editar",
-                                style: TextStyle(color: Colors.white),
-                              )
-                            ],
-                          ),
-                          color: Colors.blue,
-                          padding: EdgeInsets.all(7.0),
-                          onPressed: () {
-                            Navigator.pop(context);
-                            _showContactPage(contact: contacts[index]);
                           },
                         ),
                       ),
@@ -194,8 +196,4 @@ class _HomePageState extends State<HomePage> {
       });
     });
   }
-}
-GetIt locator = GetIt.instance;
-void setupLocator() {
-  locator.registerSingleton(CallsAndMessagesService());
 }
