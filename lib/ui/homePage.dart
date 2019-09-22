@@ -1,6 +1,7 @@
-import 'dart:io';
 
 import 'package:agenda_contatos/helpers/contactHelper.dart';
+import 'package:agenda_contatos/ui/contactPage.dart';
+import 'package:agenda_contatos/utils/imageUtil.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -11,27 +12,30 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   ContactHelper helper = ContactHelper();
   List<Contact> contacts = List();
+  var _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
- /*    Contact c = Contact();
-    c.nome = "Marcos Ferreira severino";
-    c.email = "marcosradix@gmail.com";
-    c.phone = "999575446";
-    c.img = "imgTeste";
-    helper.saveContact(c); */
-    helper.getAllContacts().then((list) {
-      print(list);
-      setState(() {
-        this.contacts = list;
-      });
-    });
+ /*  Contact c = Contact();
+    c.nome = "João Marcos Feitosa";
+    c.email = "joao.feitosa@gmail.com";
+    c.phone = "987178890";
+    c.img = null;
+    helper.saveContact(c);  */
+/* helper.getContactById(2).then((c) {
+c.img = null;
+c.nome = "Gustavo Farias";
+helper.updateContact(c);
+}); */
+
+_loadContacts();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text("Agenda de contatos",
             style: new TextStyle(color: Colors.white)),
@@ -39,9 +43,10 @@ class _HomePageState extends State<HomePage> {
             centerTitle: true,
       ),
       backgroundColor: Colors.white,
-      floatingActionButton: FloatingActionButton(onPressed: (){},
+      floatingActionButton: FloatingActionButton(onPressed: () => _showContactPage(),
       child: Icon(Icons.add),
       backgroundColor: Colors.red,
+      tooltip: "Adicionar contato",
       ),
       body: ListView.builder(
         padding: EdgeInsets.all(10.0),
@@ -65,7 +70,7 @@ Widget _contactCard(BuildContext context, int index){
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               image: DecorationImage(
-              image: _imageContact(index)
+              image: ContactUtil.imageContact(contacts[index])
               ),
             ),
           ),
@@ -87,12 +92,29 @@ Widget _contactCard(BuildContext context, int index){
         ),
       ),
     ),
+    onTap: ()=> _showContactPage(contact: contacts[index]),
   );
 }
 
-ImageProvider _imageContact(int index){
-return contacts[index].img != null ? FileImage(File(contacts[index].img)) : AssetImage("imagens/person.png");
-//return AssetImage("imagens/person.png");
+void _showContactPage({Contact contact}) async {
+  final recContact = await  Navigator.push(context, MaterialPageRoute(builder: (context) => ContactPage(contact: contact)));
+
+  if(recContact != null){
+    if(contact != null){
+      await helper.updateContact(recContact);
+    }else{
+      await helper.saveContact(recContact);
+    }
+       _loadContacts();
+  } 
+}
+
+  void _loadContacts() {
+    helper.getAllContacts().then((list) {
+      setState(() {
+        this.contacts = list;
+      });
+    });
 }
 
 }

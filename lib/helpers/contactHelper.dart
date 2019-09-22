@@ -87,6 +87,19 @@ class ContactHelper implements IContactHelper {
     Database dbContact = await db;
     dbContact.close();
   }
+
+  @override
+  Future<List<Contact>> getContactByName(String name)async {
+    Database dbContact = await db;
+    List listMap = await dbContact.query(contactTable, where: "$nameColumn LIKE '%\$?%'", whereArgs: [name]);
+    List<Contact> listContacts = List();
+    
+    for (Map contact in listMap) {
+      listContacts.add(Contact.fromMap(contact));
+    }
+    return listContacts;
+
+  }
 }
 
 class Contact {

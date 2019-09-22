@@ -7,4 +7,6 @@ abstract class IContactHelper {
   Future<int> updateContact(Contact contact);
   Future<List<Contact>> getAllContacts();
   Future<int> getNumber();
+  Future<List<Contact>> getContactByName(String name);
+
 }
