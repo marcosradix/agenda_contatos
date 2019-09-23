@@ -5,6 +5,8 @@ import 'package:agenda_contatos/utils/imageUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+enum OrderOptions {orderAz, orderZa}
+
 class HomePage extends StatefulWidget {
   final CallsAndMessagesService service;
   HomePage(this.service);
@@ -37,6 +39,21 @@ class _HomePageState extends State<HomePage> {
               style: new TextStyle(color: Colors.white)),
           backgroundColor: Colors.red,
           centerTitle: true,
+          actions: <Widget>[
+            PopupMenuButton<OrderOptions>(
+              itemBuilder: (context) => <PopupMenuEntry<OrderOptions>>[
+                const PopupMenuItem<OrderOptions>(
+                  child: Text("Ordenar de A-Z"),
+                  value: OrderOptions.orderAz,
+                ),
+                const PopupMenuItem<OrderOptions>(
+                  child: Text("Ordenar de Z-A"),
+                  value: OrderOptions.orderZa,
+                ),
+              ],
+              onSelected: _orderListContact,
+            ),
+          ],
         ),
         backgroundColor: Colors.white,
         floatingActionButton: FloatingActionButton(
@@ -51,9 +68,23 @@ class _HomePageState extends State<HomePage> {
           itemBuilder: (context, index) {
             return _contactCard(context, index);
           },
-        ));
+        ),);
   }
 
+void _orderListContact(OrderOptions result){
+switch (result) {
+  case OrderOptions.orderAz :
+  contacts.sort((a, b) => a.nome.toLowerCase().compareTo(b.nome.toLowerCase()));
+    break;
+  case OrderOptions.orderZa :
+    contacts.sort((a, b)  => b.nome.toLowerCase().compareTo(a.nome.toLowerCase()));
+    break;
+  default:
+}
+setState(() {
+  
+});
+}
   Widget _contactCard(BuildContext context, int index) {
     return GestureDetector(
       child: Card(
