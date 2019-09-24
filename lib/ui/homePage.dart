@@ -5,7 +5,7 @@ import 'package:agenda_contatos/utils/imageUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-enum OrderOptions {orderAz, orderZa}
+enum OrderOptions { orderAz, orderZa }
 
 class HomePage extends StatefulWidget {
   final CallsAndMessagesService service;
@@ -33,113 +33,116 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          title: Text("Agenda de contatos",
-              style: new TextStyle(color: Colors.white)),
-          backgroundColor: Colors.red,
-          centerTitle: true,
-          actions: <Widget>[
-            PopupMenuButton<OrderOptions>(
-              itemBuilder: (context) => <PopupMenuEntry<OrderOptions>>[
-                const PopupMenuItem<OrderOptions>(
-                  child: Text("Ordenar de A-Z"),
-                  value: OrderOptions.orderAz,
-                ),
-                const PopupMenuItem<OrderOptions>(
-                  child: Text("Ordenar de Z-A"),
-                  value: OrderOptions.orderZa,
-                ),
-              ],
-              onSelected: _orderListContact,
-            ),
-          ],
-        ),
-        backgroundColor: Colors.white,
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _showContactPage(),
-          child: Icon(Icons.add),
-          backgroundColor: Colors.red,
-          tooltip: "Adicionar contato",
-        ),
-        body: ListView.builder(
-          padding: EdgeInsets.all(10.0),
-          itemCount: contacts.length,
-          itemBuilder: (context, index) {
-            return _contactCard(context, index);
-          },
-        ),);
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: Text("Agenda de contatos",
+            style: new TextStyle(color: Colors.white)),
+        backgroundColor: Colors.red,
+        centerTitle: true,
+        actions: <Widget>[
+          PopupMenuButton<OrderOptions>(
+            itemBuilder: (context) => <PopupMenuEntry<OrderOptions>>[
+              const PopupMenuItem<OrderOptions>(
+                child: Text("Ordenar de A-Z"),
+                value: OrderOptions.orderAz,
+              ),
+              const PopupMenuItem<OrderOptions>(
+                child: Text("Ordenar de Z-A"),
+                value: OrderOptions.orderZa,
+              ),
+            ],
+            onSelected: _orderListContact,
+          ),
+        ],
+      ),
+      backgroundColor: Colors.white,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showContactPage(),
+        child: Icon(Icons.add),
+        backgroundColor: Colors.red,
+        tooltip: "Adicionar contato",
+      ),
+      body: ListView.builder(
+        padding: EdgeInsets.all(10.0),
+        itemCount: contacts.length,
+        itemBuilder: (context, index) {
+          return _contactBuilderCard(index, context);
+        },
+      ),
+    );
   }
 
-void _orderListContact(OrderOptions result){
-switch (result) {
-  case OrderOptions.orderAz :
-  contacts.sort((a, b) => a.nome.toLowerCase().compareTo(b.nome.toLowerCase()));
-    break;
-  case OrderOptions.orderZa :
-    contacts.sort((a, b)  => b.nome.toLowerCase().compareTo(a.nome.toLowerCase()));
-    break;
-  default:
-}
-setState(() {
-  
-});
-}
-  Widget _contactCard(BuildContext context, int index) {
+  GestureDetector _contactBuilderCard(int index, BuildContext context) {
     return GestureDetector(
-      child: Card(
-        child: Padding(
-          padding: EdgeInsets.all(10.0),
-          child: Row(
+          child: Card(
+           child: Stack(
             children: <Widget>[
-              Container(
-                width: 80.0,
-                height: 80.0,
-                decoration: BoxDecoration(
-                  border: Border.all(width: 2.0, color: Colors.grey),
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                      fit: BoxFit.cover,
-                      image: ContactUtil.imageContact(contacts[index])),
+              Positioned(
+                child: Container(
+                  width: 80.0,
+                  height: 80.0,
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 2.0, color: Colors.grey),
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: ContactUtil.imageContact(contacts[index])),
+                  ),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.only(left: 10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      contacts[index].nome ?? "",
-                      style: TextStyle(
-                          fontSize: 22.0, fontWeight: FontWeight.bold),
+              Positioned(
+                  top: 0,
+                  left: 80,
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          contacts[index].nome ?? "",
+                          style: TextStyle(
+                              fontSize: 22.0, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          contacts[index].email ?? "",
+                          style: TextStyle(fontSize: 18.0),
+                        ),
+                        Text(
+                          contacts[index].phone ?? "",
+                          style: TextStyle(fontSize: 18.0),
+                        ),
+                      ],
                     ),
-                    Text(
-                      contacts[index].email ?? "",
-                      style: TextStyle(fontSize: 18.0),
-                    ),
-                    Text(
-                      contacts[index].phone ?? "",
-                      style: TextStyle(fontSize: 18.0),
-                    ),
-                  ],
-                ),
-              )
+                  ))
             ],
-          ),
-        ),
-      ),
-      onTap: () {
-        HapticFeedback.mediumImpact();
-        String nemNumber =
-            contacts[index].phone.replaceAll(RegExp(r'[^\w\s]+'), '');
-        String phoneNumber = nemNumber.replaceAll(" ", "");
-        _service.call(phoneNumber);
-      },
-      onLongPress: () {
-        HapticFeedback.mediumImpact();
-        _showOptions(context, index);
-      },
-    );
+          )),
+          onTap: () {
+            HapticFeedback.mediumImpact();
+            String nemNumber =
+                contacts[index].phone.replaceAll(RegExp(r'[^\w\s]+'), '');
+            String phoneNumber = nemNumber.replaceAll(" ", "");
+            _service.call(phoneNumber);
+          },
+          onLongPress: () {
+            HapticFeedback.mediumImpact();
+            _showOptions(context, index);
+          },
+        );
+  }
+
+  void _orderListContact(OrderOptions result) {
+    switch (result) {
+      case OrderOptions.orderAz:
+        contacts.sort(
+            (a, b) => a.nome.toLowerCase().compareTo(b.nome.toLowerCase()));
+        break;
+      case OrderOptions.orderZa:
+        contacts.sort(
+            (a, b) => b.nome.toLowerCase().compareTo(a.nome.toLowerCase()));
+        break;
+      default:
+    }
+    setState(() {});
   }
 
   void _showOptions(BuildContext context, int index) {
