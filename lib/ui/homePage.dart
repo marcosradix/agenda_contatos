@@ -77,8 +77,9 @@ class _HomePageState extends State<HomePage> {
           child: Card(
            child: Stack(
             children: <Widget>[
-              Positioned(
-                child: Container(
+              Padding(
+                padding: EdgeInsets.only(bottom: 8.0, left: 3.0),
+                child:  Container(
                   width: 80.0,
                   height: 80.0,
                   decoration: BoxDecoration(
@@ -113,7 +114,8 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
-                  ))
+                  )
+                  )
             ],
           )),
           onTap: () {
